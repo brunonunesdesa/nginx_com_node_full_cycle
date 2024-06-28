@@ -11,6 +11,8 @@ services:
       - ./reverse-proxy/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - server
+    networks:
+      - mysql_node
 
   server:
     build: 
@@ -21,22 +23,33 @@ services:
     tty: true
     entrypoint: dockerize -wait tcp://db:3306 -timeout 20s docker-entrypoint.sh node app.js
     volumes:
-      - ./server/app.js:/app.js
+      - ./server/app.js:/app/app.js
     depends_on:
       - db
+    networks:
+      - mysql_node
 
   db:
-    image: mysql:latest
+    build: 
+      context: ./db
     restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: mydatabase
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
+    tty: true
+    networks:
+      - mysql_node
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=mydatabase
+      - MYSQL_USER=myuser
+      - MYSQL_PASSWORD=password
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   mysql_data:
+
+networks:
+  mysql_node:
+    driver: bridge
