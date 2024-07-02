@@ -23,7 +23,8 @@ services:
     tty: true
     entrypoint: dockerize -wait tcp://db:3306 -timeout 20s docker-entrypoint.sh node app.js
     volumes:
-      - ./server/app.js:/app/app.js
+      - ./server:/app
+      - /app/node_modules
     depends_on:
       - db
     networks:
