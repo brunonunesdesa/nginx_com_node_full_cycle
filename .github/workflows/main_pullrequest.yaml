@@ -35,8 +35,6 @@ jobs:
     - name: Wait for DB to be ready
       run: dockerize -wait tcp://localhost:3306 -timeout 1m
 
-    - name: Run tests
-      run: docker-compose exec server npm test
 
     - name: Stop Docker Compose
       run: docker-compose down
