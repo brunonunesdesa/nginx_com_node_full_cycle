@@ -1,7 +1,7 @@
 name: CI for Pull Requests with SonarCloud
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
