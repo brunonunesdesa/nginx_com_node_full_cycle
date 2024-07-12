@@ -1,9 +1,9 @@
-name: CI for Pull Requests with SonarCloud
+name: CI for Release Branches with SonarCloud
 
 on:
   push:
     branches:
-      - main
+      - 'main'
 
 jobs:
   build-and-test:
@@ -24,14 +24,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Install Dockerize
+      run: |
+        wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz
+        tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
+
     - name: Set up Docker Compose
       run: docker-compose up -d
 
     - name: Wait for DB to be ready
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y dockerize
-        dockerize -wait tcp://localhost:3306 -timeout 1m
+      run: dockerize -wait tcp://localhost:3306 -timeout 1m
 
     - name: Run tests
       run: docker-compose exec server npm test
